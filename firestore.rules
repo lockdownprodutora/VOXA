@@ -1,0 +1,779 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.uid in ['lvwWKvnHoMPDrOWTgrCZewhgcVw2', 'TkJZkTxYX0PYknDHULfr8DR7Dlw1'] ||
+        request.auth.token.email == 'lockdownprodutora@gmail.com' ||
+        request.auth.token.email == 'admin@lockdownprodutora.com.br' ||
+        (request.auth.token.email != null && request.auth.token.email.matches('.*@lockdownprodutora\\.com\\.br$')) ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        (exists(/databases/$(database)/documents/admin_users/$(request.auth.uid)) && 
+          get(/databases/$(database)/documents/admin_users/$(request.auth.uid)).data.role in ["ADMINISTRATOR", "ADMINISTRADOR", "SUPER_ADMIN", "MANAGER"]
+        ) ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && (
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ["ADMINISTRATOR", "ADMINISTRADOR", "Administrador", "SUPER_ADMIN"] ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.adminRole in ["ADMIN", "ADMINISTRATOR", "SUPER_ADMIN"]
+        ))
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Users Collection Rules
+    match /users/{userId} {
+      allow read: if true;
+      allow create: if (
+        userId in ['TkJZkTxYX0PYknDHULfr8DR7Dlw1', 'lvwWKvnHoMPDrOWTgrCZewhgcVw2']
+      ) || (
+        isSignedIn() && (
+          isAdmin() || (
+            request.auth.uid == userId &&
+            (!request.resource.data.keys().hasAny(['role', 'isAdmin', 'adminRole']) || (
+              request.resource.data.role == "Usuário Comum" &&
+              request.resource.data.isAdmin == false &&
+              (!request.resource.data.keys().hasAll(['adminRole']) || request.resource.data.adminRole == "NONE")
+            ))
+          )
+        )
+      );
+      allow update: if (
+        isSignedIn() && (
+          isAdmin() || (
+            request.auth.uid == userId &&
+            !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'isAdmin', 'adminRole'])
+          )
+        )
+      ) || (
+        // Allow follow/unfollow counter updates, verification migration, approximateLocation, invite token lifecycle, and official CEO username reconciliation
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'followersCount', 'followingCount', 'updatedAt',
+          'isVerified', 'verified', 'verificationStatus',
+          'verificationMigrationV1Done', 'officialFollowMigrationV2026Done', 'defaultFollowsInitialized',
+          'username', 'slug', 'name', 'id', 'uid',
+          'approximateLocation', 'lastSeenAt', 'lastLogin', 'referralCode', 'referredByUserId',
+          'inviteToken', 'inviteEmail', 'accountStatus', 'status', 'mustChangePassword', 'email', 'hasAuth'
+        ])
+      );
+      allow delete: if isAdmin();
+    }
+
+    // VOXA Usernames Reservation Rules
+    match /usernames/{usernameId} {
+      allow read: if true;
+      allow create: if (
+        usernameId in ['jrsantti', 'voxa']
+      ) || (
+        isSignedIn() && (
+          !exists(/databases/$(database)/documents/usernames/$(usernameId)) ||
+          get(/databases/$(database)/documents/usernames/$(usernameId)).data.uid == request.auth.uid ||
+          isAdmin()
+        )
+      );
+      allow update: if (
+        usernameId in ['jrsantti', 'voxa']
+      ) || (
+        isSignedIn() && (
+          resource.data.uid == request.auth.uid ||
+          request.resource.data.uid == request.auth.uid ||
+          isAdmin()
+        )
+      );
+      allow delete: if (
+        usernameId in ['juniorsantti', 'juniorsantti92']
+      ) || (
+        isSignedIn() && (
+          resource.data.uid == request.auth.uid ||
+          isAdmin()
+        )
+      );
+    }
+
+    match /system_settings/{settingId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    // User Invites Collection Rules
+    match /user_invites/{inviteId} {
+      allow read: if true;
+      allow create, update: if isSignedIn() || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Activation Tokens Collection Rules (High-entropy 64-char hex tokens; allow get/create/update for backend adapter)
+    match /activation_tokens/{tokenId} {
+      allow get: if true;
+      allow list: if isAdmin();
+      allow create, update: if true;
+      allow delete: if isAdmin();
+    }
+
+    // Admins Collection Rules
+    match /admins/{adminId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Artists Collection Rules
+    match /artists/{artistId} {
+      allow read: if true;
+      allow create, update, delete: if isSignedIn();
+    }
+
+    // Music Streams Collection Rules
+    match /music_streams/{streamId} {
+      allow read: if true;
+      allow create, update, delete: if isSignedIn();
+    }
+
+    // Communities Collection Rules
+    match /communities/{communityId} {
+      allow read: if true;
+      allow create, update, delete: if isSignedIn();
+    }
+
+    // Store Products Collection Rules
+    match /store_products/{productId} {
+      allow read: if true;
+      allow create: if isSignedIn() && (
+        isAdmin() || (
+          request.resource.data.status == 'Pendente' &&
+          (request.resource.data.sellerId == request.auth.uid || request.resource.data.sellerId == request.auth.token.email)
+        )
+      );
+      allow update: if isSignedIn() && (
+        isAdmin() || (
+          (resource.data.sellerId == request.auth.uid || resource.data.sellerId == request.auth.token.email) &&
+          (request.resource.data.status == 'Pendente' || request.resource.data.status == resource.data.status) &&
+          (request.resource.data.sellerId == resource.data.sellerId)
+        )
+      );
+      allow delete: if isAdmin() || (
+        isSignedIn() &&
+        (resource.data.sellerId == request.auth.uid || resource.data.sellerId == request.auth.token.email) &&
+        resource.data.status == 'Pendente'
+      );
+    }
+
+    match /uploads/{uploadId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    // Company Settings Collection Rules
+    match /company_settings/{settingId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Seller Requests Collection Rules
+    match /custom_requests/{requestId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn();
+      allow delete: if isAdmin();
+    }
+
+    // Store Settings Collection Rules
+    match /store_settings/{settingsId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Store Orders Collection Rules
+    match /store_orders/{orderId} {
+      allow read: if isSignedIn() && (
+        resource.data.buyerId == request.auth.uid || 
+        resource.data.buyerEmail == request.auth.token.email ||
+        resource.data.sellerId == request.auth.uid ||
+        isAdmin()
+      );
+      allow create: if true; // anyone can place an order/purchase during checkout
+      allow update, delete: if isAdmin();
+    }
+
+    // Sellers Credentials Rules (strictly secure, server-side only)
+    match /sellers_credentials/{sellerId} {
+      allow read, write: if isAdmin();
+    }
+
+    // OAuth States Rules (strictly secure, server-side only)
+    match /oauth_states/{stateId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Shows (Tickets) Collection Rules
+    match /shows/{showId} {
+      allow read: if true;
+      allow create: if isSignedIn() && (
+        isAdmin() || (
+          request.resource.data.status == 'Pendente' &&
+          (request.resource.data.organizerId == request.auth.uid || request.resource.data.organizerId == request.auth.token.email)
+        )
+      );
+      allow update: if isSignedIn() && (
+        isAdmin() || (
+          (resource.data.organizerId == request.auth.uid || resource.data.organizerId == request.auth.token.email) &&
+          (request.resource.data.status == 'Pendente' || request.resource.data.status == resource.data.status) &&
+          (request.resource.data.organizerId == resource.data.organizerId)
+        )
+      );
+      allow delete: if isAdmin() || (
+        isSignedIn() &&
+        (resource.data.organizerId == request.auth.uid || resource.data.organizerId == request.auth.token.email) &&
+        resource.data.status == 'Pendente'
+      );
+    }
+
+    // Tickets Issued Collection Rules
+    match /tickets_issued/{ticketId} {
+      allow read: if isSignedIn() && (
+        resource.data.buyerId == request.auth.uid || 
+        resource.data.buyerEmail == request.auth.token.email ||
+        resource.data.organizerId == request.auth.uid ||
+        isAdmin()
+      );
+      allow create: if true; // anyone can buy/issue a ticket during checkout
+      allow update, delete: if isAdmin();
+    }
+
+    // Distribution Clearances Rules
+    match /distribution_clearances/{clearanceId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // Drive Important Files Rules
+    match /lockdown_drive_important_files/{fileId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // Drive Activity Logs Rules
+    match /lockdown_drive_activity_logs/{logId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // Music Shares Rules
+    match /lockdown_music_shares/{shareId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // YouTube Verification Requests Rules
+    match /youtube_verification_requests/{requestId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // Notifications Rules
+    match /notifications/{notificationId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || resource.data.userEmail == request.auth.token.email || isAdmin());
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // Support Tickets Rules
+    match /support_tickets/{ticketId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.token.email || resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && (request.resource.data.userId == request.auth.token.email || request.resource.data.userId == request.auth.uid || isAdmin());
+      allow update: if isSignedIn() && (resource.data.userId == request.auth.token.email || resource.data.userId == request.auth.uid || isAdmin()) && (request.resource.data.userId == request.auth.token.email || request.resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // Subscription Plans Rules
+    match /subscription_plans/{planId} {
+      allow read: if true;
+      allow create: if isSignedIn() && (
+        isAdmin() || (
+          request.resource.data.status == 'Pendente' &&
+          request.resource.data.published == false &&
+          (!request.resource.data.keys().hasAny(['approvedAt', 'approvedBy', 'commissionPercent'])) &&
+          (
+            request.resource.data.ownerId == request.auth.uid || 
+            request.resource.data.sellerId == request.auth.uid || 
+            request.resource.data.sellerId == request.auth.token.email
+          )
+        )
+      );
+      allow update: if isSignedIn() && (
+        isAdmin() || (
+          (
+            resource.data.ownerId == request.auth.uid || 
+            resource.data.sellerId == request.auth.uid || 
+            resource.data.sellerId == request.auth.token.email
+          ) &&
+          (
+            request.resource.data.status == 'Pendente' || 
+            request.resource.data.status == 'Ajustes solicitados' || 
+            request.resource.data.status == resource.data.status
+          ) &&
+          (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['approvedAt', 'approvedBy', 'commissionPercent', 'published', 'status'])) &&
+          (
+            request.resource.data.ownerId == resource.data.ownerId || 
+            request.resource.data.sellerId == resource.data.sellerId
+          )
+        )
+      );
+      allow delete: if isAdmin() || (
+        isSignedIn() &&
+        (
+          resource.data.ownerId == request.auth.uid || 
+          resource.data.sellerId == request.auth.uid || 
+          resource.data.sellerId == request.auth.token.email
+        ) &&
+        (
+          resource.data.status == 'Pendente' || 
+          resource.data.status == 'Ajustes solicitados'
+        )
+      );
+    }
+
+    // Commission Settings Rules
+    match /commission_settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Wallets Rules (Protected - owner or admins can read; admin or promotional referral bonus can write promoBalance)
+    match /wallets/{userId} {
+      allow read: if isSignedIn() && (userId == request.auth.uid || isAdmin());
+      allow create: if isAdmin() || (
+        isSignedIn() &&
+        (!request.resource.data.keys().hasAny(['availableBalance']) || request.resource.data.availableBalance == 0)
+      );
+      allow update: if isAdmin() || (
+        isSignedIn() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['promoBalance', 'updatedAt'])
+      );
+      allow delete: if isAdmin();
+    }
+
+    // Wallet Transactions Rules (Protected - owner or admins can read)
+    match /wallet_transactions/{transactionId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAdmin() || (
+        isSignedIn() &&
+        request.resource.data.type == 'REFERRAL_BONUS' &&
+        request.resource.data.walletType == 'PROMO'
+      );
+      allow update, delete: if isAdmin();
+    }
+
+    // VOXA Posts Collection Rules
+    match /posts/{postId} {
+      allow read: if true;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if (
+        isSignedIn() && (
+          resource.data.userId == request.auth.uid ||
+          isAdmin() ||
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likesCount', 'likesList', 'authorUsername', 'authorName', 'authorAvatar', 'updatedAt'])
+        )
+      ) || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['authorUsername', 'authorName', 'userUsername']);
+      allow delete: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // VOX Microblogging Rules
+    match /voxes/{voxId} {
+      allow read: if true;
+      allow create: if isSignedIn() && request.resource.data.authorId == request.auth.uid;
+      allow update: if (
+        isSignedIn() && (
+          resource.data.authorId == request.auth.uid ||
+          isAdmin() ||
+          request.resource.data.diff(resource.data).affectedKeys().hasAny(['likeCount', 'likesList', 'repostCount', 'repostsList', 'replyCount', 'authorUsername', 'authorName', 'authorAvatar', 'authorVerified', 'updatedAt'])
+        )
+      ) || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['authorUsername', 'authorName', 'userUsername']);
+      allow delete: if isSignedIn() && (resource.data.authorId == request.auth.uid || isAdmin());
+    }
+
+    // VOX Reports Rules
+    match /vox_reports/{reportId} {
+      allow read: if isAdmin();
+      allow create: if isSignedIn() && request.resource.data.reporterId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // Stores Collection Rules
+    match /stores/{storeId} {
+      allow read: if true;
+      allow create: if isSignedIn() && (request.resource.data.sellerId == request.auth.uid || isAdmin());
+      allow update: if isSignedIn() && (resource.data.sellerId == request.auth.uid || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // Events Collection Rules
+    match /events/{eventId} {
+      allow read: if true;
+      allow create: if isSignedIn() && (request.resource.data.ownerId == request.auth.uid || request.resource.data.organizerId == request.auth.uid || isAdmin());
+      allow update: if isSignedIn() && (resource.data.ownerId == request.auth.uid || request.resource.data.organizerId == request.auth.uid || isAdmin());
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.ownerId == request.auth.uid);
+    }
+
+    // News Articles Collection Rules
+    match /news_articles/{articleId} {
+      allow read: if true;
+      allow create: if isSignedIn() && (request.resource.data.authorId == request.auth.uid || isAdmin());
+      allow update: if isSignedIn() && (request.resource.data.authorId == request.auth.uid || isAdmin());
+      allow delete: if isAdmin() || (isSignedIn() && request.resource.data.authorId == request.auth.uid);
+    }
+
+    // Creator Plans Collection Rules
+    match /creator_plans/{planId} {
+      allow read: if true;
+      allow create: if isSignedIn() && (request.resource.data.creatorId == request.auth.uid || isAdmin());
+      allow update: if isSignedIn() && (request.resource.data.creatorId == request.auth.uid || isAdmin());
+      allow delete: if isAdmin() || (isSignedIn() && request.resource.data.creatorId == request.auth.uid);
+    }
+
+    // Subscriptions Collection Rules
+    match /subscriptions/{subId} {
+      allow read: if isSignedIn() && (resource.data.subscriberId == request.auth.uid || resource.data.creatorId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && (request.resource.data.subscriberId == request.auth.uid || isAdmin());
+      allow update: if isSignedIn() && (request.resource.data.subscriberId == request.auth.uid || resource.data.creatorId == request.auth.uid || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // Follows Rules
+    match /follows/{followId} {
+      allow read: if true;
+      allow create, update: if (
+        request.resource.data.followingId in ['TkJZkTxYX0PYknDHULfr8DR7Dlw1', 'lvwWKvnHoMPDrOWTgrCZewhgcVw2'] ||
+        request.resource.data.followingUid in ['TkJZkTxYX0PYknDHULfr8DR7Dlw1', 'lvwWKvnHoMPDrOWTgrCZewhgcVw2']
+      ) || (
+        isSignedIn() && (
+          request.resource.data.followerId == request.auth.uid ||
+          request.resource.data.followerUid == request.auth.uid ||
+          isAdmin()
+        )
+      );
+      allow delete: if isSignedIn() && (
+        resource.data.followerId == request.auth.uid ||
+        resource.data.followerUid == request.auth.uid ||
+        isAdmin()
+      );
+    }
+
+    // Private User Information Rules
+    match /user_private/{userId} {
+      allow read, write: if isSignedIn() && (userId == request.auth.uid || isAdmin());
+    }
+
+    // --- VOXA dating (Meu Par) Rules ---
+    match /dating_profiles/{profileId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && (profileId == request.auth.uid || isAdmin());
+      allow delete: if isSignedIn() && (profileId == request.auth.uid || isAdmin());
+    }
+
+    match /dating_actions/{actionId} {
+      allow read, create: if isSignedIn();
+      allow update, delete: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /dating_matches/{matchId} {
+      allow read: if isSignedIn() && (resource.data.userA == request.auth.uid || resource.data.userB == request.auth.uid || isAdmin());
+      allow create, update: if isSignedIn();
+      allow delete: if isSignedIn() && (resource.data.userA == request.auth.uid || resource.data.userB == request.auth.uid || isAdmin());
+    }
+
+    // --- VOXA Ads Rules ---
+    match /ad_campaigns/{campaignId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && (resource.data.userId == request.auth.uid || resource.data.targetOwnerUid == request.auth.uid || isAdmin());
+      allow delete: if isAdmin() || (isSignedIn() && (resource.data.userId == request.auth.uid || resource.data.targetOwnerUid == request.auth.uid));
+    }
+
+    match /profile_banners/{bannerId} {
+      allow read: if true;
+      allow create: if isSignedIn() && (request.resource.data.ownerUid == request.auth.uid || request.resource.data.sponsorUid == request.auth.uid || isAdmin());
+      allow update: if isSignedIn() || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['clicksCount', 'impressionsCount', 'updatedAt']);
+      allow delete: if isSignedIn() && (resource.data.ownerUid == request.auth.uid || resource.data.sponsorUid == request.auth.uid || isAdmin());
+    }
+
+    match /profile_ad_settings/{userId} {
+      allow read: if true;
+      allow write: if isSignedIn() && (userId == request.auth.uid || isAdmin());
+    }
+
+    match /ad_config/{configId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // --- VOXA Admin & Profile Categories Rules ---
+    match /admin_users/{uid} {
+      allow read: if true;
+      allow create, update: if isAdmin() || (request.resource.data.keys().hasAll(['uid', 'role', 'updatedBy']) && request.resource.data.role in ['SUPER_ADMIN', 'ADMINISTRATOR', 'MANAGER', 'SUPPORT']);
+      allow delete: if isAdmin() || true;
+    }
+
+    match /profile_categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAdmin() || (isSignedIn() && (exists(/databases/$(database)/documents/admin_users/$(request.auth.uid)) && get(/databases/$(database)/documents/admin_users/$(request.auth.uid)).data.role in ["MANAGER", "ADMINISTRATOR", "SUPER_ADMIN"]));
+    }
+
+    match /admin_audit_logs/{logId} {
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if false;
+    }
+
+    // --- CHAT & MESSAGING RULES ---
+    match /chat_threads/{threadId} {
+      allow read: if isSignedIn() && (request.auth.uid in resource.data.participants || isAdmin());
+      allow create: if isSignedIn() && (request.auth.uid in request.resource.data.participants || isAdmin());
+      allow update: if isSignedIn() && (request.auth.uid in resource.data.participants || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    match /chat_messages/{messageId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && (request.resource.data.senderUid == request.auth.uid || isAdmin());
+      allow update: if isSignedIn() && (resource.data.senderUid == request.auth.uid || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // --- SUSSURROS VOXA RULES ---
+    match /sussurro_boxes/{userId} {
+      allow read: if true;
+      allow write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    match /sussurro_messages/{messageId} {
+      allow read: if isSignedIn() && (resource.data.recipientUid == request.auth.uid || isAdmin());
+      allow create: if true;
+      allow update, delete: if isSignedIn() && (resource.data.recipientUid == request.auth.uid || isAdmin());
+    }
+
+    match /sussurro_private/{messageId} {
+      allow read: if false; // Strict isolation: only secure backend/admin SDK has access to decapsulate identity
+      allow create: if !request.resource.data.keys().hasAll(['senderUid']) || request.resource.data.senderUid == null || (isSignedIn() && request.resource.data.senderUid == request.auth.uid);
+      allow update, delete: if false;
+    }
+
+    match /sussurro_reports/{reportId} {
+      allow read: if isAdmin();
+      allow create: if true;
+      allow update, delete: if isAdmin();
+    }
+
+    match /anonymous_messages_config/{configId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // --- VOXA Engagement Analytics Rules ---
+    match /analytics/{userId} {
+      allow read, write: if isSignedIn() && (userId == request.auth.uid || isAdmin());
+    }
+
+    // --- VOXA Public Activities Rules ---
+    match /activities/{activityId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['authorUsername', 'authorName', 'userUsername']);
+      allow delete: if isAdmin();
+    }
+
+    // --- ENQUETES (POLLS) RULES ---
+    match /polls/{pollId} {
+      allow read: if true;
+      allow create: if isSignedIn() && request.resource.data.authorId == request.auth.uid;
+      allow update: if isSignedIn();
+      allow delete: if isSignedIn() && (resource.data.authorId == request.auth.uid || isAdmin());
+    }
+
+    match /poll_votes/{voteId} {
+      allow read: if true;
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    // --- VOXA TRADE RULES ---
+    match /trade_positions/{positionId} {
+      allow read: if true;
+      allow create, update: if isSignedIn() || isAdmin() || (request.resource.data.keys().hasAll(['id', 'userUid', 'assetId', 'direction', 'stakeAmount', 'entryPrice', 'status', 'marketDataProvider']));
+      allow delete: if isAdmin();
+    }
+
+    match /trade_settings/{settingId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.keys().hasAll([
+        'enabled',
+        'realMoneyEnabled',
+        'winPayoutPercent',
+        'tradeFeePercent',
+        'minimumStake',
+        'maximumStake',
+        'maximumUserExposure',
+        'maximumPlatformExposure',
+        'allowedDurations',
+        'allowedAssets'
+      ]) &&
+      request.resource.data.enabled is bool &&
+      request.resource.data.realMoneyEnabled is bool &&
+      request.resource.data.winPayoutPercent is number &&
+      request.resource.data.winPayoutPercent >= 1 &&
+      request.resource.data.winPayoutPercent <= 100 &&
+      request.resource.data.tradeFeePercent is number &&
+      request.resource.data.tradeFeePercent >= 0 &&
+      request.resource.data.tradeFeePercent <= 50 &&
+      request.resource.data.minimumStake is number &&
+      request.resource.data.minimumStake >= 100 &&
+      request.resource.data.maximumStake is number &&
+      request.resource.data.maximumStake >= request.resource.data.minimumStake &&
+      request.resource.data.maximumUserExposure is number &&
+      request.resource.data.maximumUserExposure >= request.resource.data.maximumStake &&
+      request.resource.data.maximumPlatformExposure is number &&
+      request.resource.data.maximumPlatformExposure >= request.resource.data.maximumUserExposure &&
+      request.resource.data.allowedDurations is list &&
+      request.resource.data.allowedDurations.size() > 0 &&
+      request.resource.data.allowedAssets is list &&
+      request.resource.data.allowedAssets.size() > 0;
+      allow delete: if isAdmin();
+    }
+
+    // --- PRESENCE & APPROXIMATE LOCATION RULES ---
+    match /user_presence/{uid} {
+      allow read: if true;
+      allow create, update: if true;
+      allow delete: if isAdmin() || (isSignedIn() && request.auth.uid == uid);
+    }
+
+    // --- REFERRALS & PROMOTIONAL WALLET SETTINGS RULES ---
+    match /referral_settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin() || true;
+    }
+
+    match /referrals/{referralId} {
+      allow read: if true;
+      allow create, update: if isSignedIn() || isAdmin() || true;
+      allow delete: if isAdmin();
+    }
+
+    // --- LEAGUE & GAMIFICATION RULES ---
+    match /league_participants/{participantId} {
+      allow read: if true;
+      allow create, update: if isSignedIn() || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /league_point_transactions/{txId} {
+      allow read: if true;
+      allow create: if isSignedIn() || isAdmin();
+      allow update, delete: if isAdmin();
+    }
+
+    match /raffles/{raffleId} {
+      allow read: if true;
+      allow create, update, delete: if isSignedIn() || isAdmin();
+    }
+
+    match /raffle_participants/{partId} {
+      allow read: if true;
+      allow create, update, delete: if isSignedIn() || isAdmin();
+    }
+
+    match /fundraisers/{fundraiserId} {
+      allow read: if true;
+      allow create, update: if isSignedIn() || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /fundraiser_contributions/{contributionId} {
+      allow read: if true;
+      allow create, update: if isSignedIn() || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // --- VOXA AI & VOXA STUDIO IA RULES ---
+    match /voxa_ai_settings/{settingId} {
+      allow read: if true;
+      allow create, update: if isAdmin() || isSignedIn();
+      allow delete: if isAdmin();
+    }
+
+    match /voxa_presenter_library/{itemId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() || isSignedIn();
+    }
+
+    match /voxa_presenter_avatars/{avatarId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() || isSignedIn();
+    }
+
+    match /voxa_presenter_scenarios/{scenarioId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin() || isSignedIn();
+    }
+
+    match /voxa_ai_jobs/{jobId} {
+      allow read: if true;
+      allow create, update: if isAdmin() || isSignedIn();
+      allow delete: if isAdmin();
+    }
+
+    match /voxa_ai_credits/{userId} {
+      allow read: if true;
+      allow create, update: if isAdmin() || isSignedIn();
+      allow delete: if isAdmin();
+    }
+
+    match /ai_jobs/{jobId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create, update: if isSignedIn() && (request.resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    match /ai_generations_library/{itemId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create, update: if isSignedIn() && (request.resource.data.userId == request.auth.uid || isAdmin());
+      allow delete: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /ai_system_settings/{settingId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // --- VOXA INVEST RULES ---
+    match /invest_products/{productId} {
+      allow read: if true;
+      allow create, update: if true;
+      allow delete: if isAdmin();
+    }
+
+    match /invest_settings/{settingId} {
+      allow read: if true;
+      allow create, update: if true;
+      allow delete: if isAdmin();
+    }
+
+    match /invest_positions/{positionId} {
+      allow read: if true;
+      allow create, update: if isSignedIn() || isAdmin() || (request.resource.data.keys().hasAll(['id', 'userUid', 'productId', 'productName', 'principalAmountCentavos', 'appliedAt', 'maturityDate', 'status']));
+      allow delete: if isAdmin();
+    }
+
+    match /invest_pix_orders/{orderId} {
+      allow read: if true;
+      allow create, update: if true;
+      allow delete: if isAdmin();
+    }
+  }
+}

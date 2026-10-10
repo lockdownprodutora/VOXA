@@ -1,0 +1,30 @@
+/* ====================================================
+   VOXA DESIGN TOKENS - SINGLE SOURCE OF TRUTH
+   ==================================================== */
+:root {
+  --bg-dark: #000000;
+  --bg-light: #fafafa;
+  --surface-light: #ffffff;
+  --surface-dark: #121212;
+  
+  --text-on-dark: #ffffff;
+  --text-secondary-on-dark: #a3a3a3;
+  
+  --text-on-light: #000000;
+  --text-secondary-on-light: #666666;
+  
+  --border-light: #e5e5e5;
+  --border-dark: #262626;
+
+  --accent-blue: #0095f6; /* Official Verified badge color */
+  --accent-red: #ef4444;  /* Heart / Like / Alert badge color */
+  --accent-green: #10b981; /* Positive Wallet transactions */
+
+  /* VOXA Invest Design Tokens */
+  --invest-bg-dark: #000000;
+  --invest-surface-dark: #121212;
+  --invest-text-primary-dark: #FFFFFF;
+  --invest-text-secondary-dark: #B8BBC7;
+  --invest-accent: #FF1744;
+  --invest-warning: #FFC107;
+}

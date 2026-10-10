@@ -1,0 +1,226 @@
+@import "tailwindcss";
+@import "./design-tokens.css";
+
+.dark {
+  --invest-bg-dark: #000000;
+  --invest-surface-dark: #121212;
+  --invest-text-primary-dark: #FFFFFF;
+  --invest-text-secondary-dark: #B8BBC7;
+  --invest-accent: #FF1744;
+  --invest-warning: #FFC107;
+  background-color: var(--invest-bg-dark);
+  color: var(--invest-text-primary-dark);
+}
+
+.dark input[type="text"],
+.dark input[type="number"],
+.dark input[type="email"],
+.dark input[type="password"],
+.dark textarea,
+.dark select {
+  background-color: var(--invest-bg-dark) !important;
+  color: var(--invest-text-primary-dark) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: var(--invest-text-secondary-dark) !important;
+}
+
+@layer base {
+  body {
+    background-color: var(--bg-light);
+    color: var(--text-on-light);
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+.font-orbitron {
+  font-family: 'Orbitron', sans-serif;
+}
+
+.font-bebas {
+  font-family: 'Bebas Neue', sans-serif;
+}
+
+.font-impact {
+  font-family: Impact, sans-serif;
+}
+
+.cyber-grid {
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ====================================================
+   VOXA TWO-CONTEXT HIGH-CONTRAST SYSTEM
+   ==================================================== */
+
+/* --- DARK SURFACE (Sidebar, Header, Mobile Nav, Dark Modals) --- */
+.surface-dark,
+aside,
+header,
+.bg-black\/95 {
+  background-color: var(--bg-dark) !important;
+  color: var(--text-on-dark) !important;
+}
+
+/* Enforce children of dark surfaces to default to white text without universal override */
+.surface-dark h1, .surface-dark h2, .surface-dark h3, .surface-dark h4, .surface-dark span, .surface-dark p, .surface-dark a, .surface-dark button,
+aside h1, aside h2, aside h3, aside h4, aside span, aside p, aside a, aside button {
+  color: inherit;
+}
+
+/* Inactive gray text inside dark surfaces */
+.text-inactive-on-dark {
+  color: var(--text-secondary-on-dark) !important;
+}
+
+/* Hover effect for buttons on dark surfaces */
+.surface-dark button:hover,
+aside button:hover {
+  background-color: #171717 !important;
+}
+
+/* --- LIGHT SURFACE (Main Content Area, Light Cards, Forms) --- */
+.surface-light,
+main,
+.main-content,
+.feed-container,
+.bg-\[\#12111d\],
+.bg-\[\#0c0b16\]\/75,
+.bg-\[\#131121\],
+.bg-\[\#1b1928\],
+.bg-\[\#12111d\]\/40 {
+  background-color: var(--surface-light) !important;
+  color: var(--text-on-light) !important;
+  border-color: var(--border-light) !important;
+}
+
+/* Inside light surfaces, reset titles and texts to black */
+.surface-light h1, .surface-light h2, .surface-light h3, .surface-light h4, .surface-light span, .surface-light p, .surface-light a, .surface-light button,
+main h1, main h2, main h3, main h4, main span, main p, main a, main button,
+.main-content h1, .main-content h2, .main-content h3, .main-content p, .main-content span {
+  color: inherit;
+}
+
+/* Secondary/gray text inside light surfaces */
+.text-secondary-on-light {
+  color: var(--text-secondary-on-light) !important;
+}
+
+/* --- SVG Icons Color System (Strict currentcolor behavior) --- */
+svg {
+  stroke: currentColor;
+  fill: none;
+}
+
+/* --- EXCLUSIONS (Keep official verifications and colored accents) --- */
+.text-sky-500, .text-blue-500, .text-sky-400, .text-blue-400,
+svg.text-sky-400, svg.text-sky-500, svg.text-blue-500,
+svg.text-violet-400, .text-violet-400 {
+  color: var(--accent-blue) !important;
+}
+
+.text-rose-500, .text-red-500, svg.text-rose-500, svg.text-red-500, .text-red-600 {
+  color: var(--accent-red) !important;
+}
+
+.text-emerald-500, .text-green-500, .bg-emerald-500\/10 {
+  color: var(--accent-green) !important;
+}
+
+/* --- Form Controls / Inputs & Options (Light Area) --- */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea,
+select {
+  background-color: var(--surface-light) !important;
+  color: var(--text-on-light) !important;
+  border: 1px solid var(--border-light) !important;
+  border-radius: 12px !important;
+  padding: 10px 14px !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-secondary-on-light) !important;
+}
+
+/* Dropdown list boxes and select option dropdown menus */
+.absolute.bg-\[\#12111d\],
+.dropdown-menu,
+select option,
+.bg-\[\#12111d\][role="menu"] {
+  background-color: var(--surface-light) !important;
+  border: 1px solid var(--border-light) !important;
+  color: var(--text-on-light) !important;
+}
+
+/* Modals Overlay Frame blur */
+.fixed.inset-0.bg-black\/80 {
+  backdrop-filter: blur(8px) !important;
+}
+
+/* Modals Content Area (Light Theme) */
+.fixed .bg-\[\#12111d\],
+.fixed .bg-\[\#0c0b16\],
+.modal-content {
+  background-color: var(--surface-light) !important;
+  border: 1px solid var(--border-light) !important;
+  color: var(--text-on-light) !important;
+}
+
+/* --- Premium Buttons System --- */
+/* Primary Action Button (White text on black button) */
+button.btn-primary,
+.btn-primary {
+  background-color: var(--bg-dark) !important;
+  color: var(--text-on-dark) !important;
+  border: 1px solid var(--bg-dark) !important;
+}
+button.btn-primary:hover {
+  background-color: #222222 !important;
+}
+
+/* Secondary Action Button (Black text on white/gray button) */
+button.btn-secondary,
+.btn-secondary {
+  background-color: var(--surface-light) !important;
+  color: var(--text-on-light) !important;
+  border: 1px solid var(--border-light) !important;
+}
+button.btn-secondary:hover {
+  background-color: #f5f5f5 !important;
+}
+
+/* Sent message bubble (Dark) */
+.sent-message-bubble {
+  background-color: var(--bg-dark) !important;
+  color: var(--text-on-dark) !important;
+}
+
+/* Received message bubble (Light) */
+.received-message-bubble {
+  background-color: #f3f4f6 !important;
+  color: var(--text-on-light) !important;
+}
+
+/* --- Admin Panel Tables --- */
+.admin-table th,
+th.text-left {
+  background-color: #121212 !important;
+  color: #ffffff !important;
+  text-transform: uppercase !important;
+  font-size: 11px !important;
+}
+
+.admin-table td,
+td {
+  background-color: var(--surface-light) !important;
+  color: var(--text-on-light) !important;
+}

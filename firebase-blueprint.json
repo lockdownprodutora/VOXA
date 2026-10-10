@@ -1,0 +1,862 @@
+{
+  "entities": {
+    "DetailedArtist": {
+      "title": "DetailedArtist",
+      "description": "Perfis detalhados dos artistas da gravadora Lockdown",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "realName": { "type": "string" },
+        "artistType": { "type": "string" },
+        "company": { "type": "string" },
+        "bio": { "type": "string" },
+        "image": { "type": "string" },
+        "imageStoragePath": { "type": "string" },
+        "spotifyUrl": { "type": "string" },
+        "spotifyArtistId": { "type": "string" },
+        "instagramUrl": { "type": "string" },
+        "tiktokUrl": { "type": "string" },
+        "youtubeUrl": { "type": "string" },
+        "monthlyListeners": { "type": "integer" },
+        "listenersUpdatedAt": { "type": "string" },
+        "featured": { "type": "boolean" },
+        "status": { "type": "string" },
+        "userId": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "name", "artistType", "image", "spotifyUrl", "monthlyListeners", "status"]
+    },
+    "MusicStream": {
+      "title": "MusicStream",
+      "description": "Músicas e resultados de streams das plataformas digitais da Lockdown",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "artistIds": { "type": "array" },
+        "artistNames": { "type": "string" },
+        "coverUrl": { "type": "string" },
+        "coverStoragePath": { "type": "string" },
+        "audioUrl": { "type": "string" },
+        "audioStoragePath": { "type": "string" },
+        "audioFormat": { "type": "string" },
+        "totalStreams": { "type": "integer" },
+        "releaseDate": { "type": "string" },
+        "spotifyUrl": { "type": "string" },
+        "youtubeUrl": { "type": "string" },
+        "appleMusicUrl": { "type": "string" },
+        "deezerUrl": { "type": "string" },
+        "amazonMusicUrl": { "type": "string" },
+        "description": { "type": "string" },
+        "featured": { "type": "boolean" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "title", "artistIds", "coverUrl", "totalStreams", "status"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Produtos físicos e digitais da Loja Lockdown",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "fullDescription": { "type": "string" },
+        "price": { "type": "string" },
+        "category": { "type": "string" },
+        "sku": { "type": "string" },
+        "stock": { "type": "integer" },
+        "status": { "type": "string" },
+        "seller": { "type": "string" },
+        "sellerId": { "type": "string" },
+        "sellerName": { "type": "string" },
+        "sellerType": { "type": "string" },
+        "sellerStatus": { "type": "string" },
+        "image": { "type": "string" },
+        "images": { "type": "array" },
+        "featured": { "type": "boolean" },
+        "badge": { "type": "string" },
+        "tags": { "type": "array" },
+        "weight": { "type": "string" },
+        "digitalFileUrl": { "type": "string" }
+      },
+      "required": ["id", "name", "price", "category", "stock", "status"]
+    },
+    "SellerRequest": {
+      "title": "SellerRequest",
+      "description": "Solicitações de usuários comuns para se tornarem vendedores na Loja Lockdown",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "storeName": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "document": { "type": "string" },
+        "type": { "type": "string" },
+        "category": { "type": "string" },
+        "description": { "type": "string" },
+        "socials": { "type": "string" },
+        "observations": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "name", "storeName", "email", "status", "createdAt"]
+    },
+    "StoreSettings": {
+      "title": "StoreSettings",
+      "description": "Configurações globais de taxas e permissões da Loja",
+      "type": "object",
+      "properties": {
+        "storeName": { "type": "string" },
+        "storeActive": { "type": "boolean" },
+        "defaultCommission": { "type": "integer" },
+        "lowStockThreshold": { "type": "integer" },
+        "allowSellers": { "type": "boolean" },
+        "requireApproval": { "type": "boolean" },
+        "freeShippingThreshold": { "type": "number" }
+      },
+      "required": ["storeName", "defaultCommission"]
+    },
+    "StoreOrder": {
+      "title": "StoreOrder",
+      "description": "Pedidos realizados na Loja, registrando valores brutos e comissões persistidas no ato da compra",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "user": { "type": "string" },
+        "item": { "type": "string" },
+        "productId": { "type": "string" },
+        "quantity": { "type": "integer" },
+        "amount": { "type": "string" },
+        "grossValue": { "type": "number" },
+        "commissionPercent": { "type": "number" },
+        "commissionValue": { "type": "number" },
+        "netValue": { "type": "number" },
+        "sellerId": { "type": "string" },
+        "sellerName": { "type": "string" },
+        "status": { "type": "string" },
+        "date": { "type": "string" }
+      },
+      "required": ["id", "userId", "item", "productId", "grossValue", "commissionPercent", "commissionValue", "netValue", "status", "date"]
+    },
+    "FirestoreUser": {
+      "title": "FirestoreUser",
+      "description": "Dados cadastrais centralizados de usuários Lockdown",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "lastLogin": { "type": "string" },
+        "photoURL": { "type": "string" }
+      },
+      "required": ["uid", "name", "email", "role", "status", "createdAt"]
+    },
+    "ArtistShare": {
+      "title": "ArtistShare",
+      "description": "Detalhamento de participação e divisão de faturamento de lançamentos musicais",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "artistPhoto": { "type": "string" },
+        "artistName": { "type": "string" },
+        "artistEmail": { "type": "string" },
+        "paymentEmail": { "type": "string" },
+        "artistPercentage": { "type": "integer" },
+        "distributor": { "type": "string" },
+        "status": { "type": "string" },
+        "notes": { "type": "string" },
+        "participants": { "type": "array" },
+        "history": { "type": "array" },
+        "userId": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "artistName", "artistEmail", "artistPercentage", "distributor", "status"]
+    },
+    "DistributionClearance": {
+      "title": "DistributionClearance",
+      "description": "Liberação de voz e autorização de distribuição para MCs, DJs ou Produtores",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "image": { "type": "string" },
+        "artistName": { "type": "string" },
+        "status": { "type": "string" },
+        "notes": { "type": "string" },
+        "userId": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "artistName", "image", "status"]
+    },
+    "Community": {
+      "title": "Community",
+      "description": "Comunidades e grupos da Lockdown no WhatsApp/Discord",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "coverUrl": { "type": "string" },
+        "whatsappUrl": { "type": "string" },
+        "discordUrl": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "name", "coverUrl", "status"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "Notificações internas de faturamento ou alteração de status do usuário",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "title", "message", "read", "createdAt"]
+    },
+    "SupportTicket": {
+      "title": "SupportTicket",
+      "description": "Tickets de suporte abertos por usuários para contato direto com admin",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "subject": { "type": "string" },
+        "category": { "type": "string" },
+        "message": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "messages": { "type": "array" }
+      },
+      "required": ["id", "userId", "userName", "subject", "category", "message", "status", "createdAt"]
+    },
+    "SubscriptionPlan": {
+      "title": "SubscriptionPlan",
+      "description": "Planos de assinaturas criados por vendedores e aprovados pelo administrador",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "price": { "type": "number" },
+        "periodicity": { "type": "string" },
+        "benefits": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "status": { "type": "string" },
+        "sellerId": { "type": "string" },
+        "sellerName": { "type": "string" },
+        "rejectionReason": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "name", "price", "periodicity", "benefits", "status", "sellerId", "sellerName", "createdAt"]
+    },
+    "CommissionSettings": {
+      "title": "CommissionSettings",
+      "description": "Configurações de divisão de comissão global da Lockdown",
+      "type": "object",
+      "properties": {
+        "storeCommissionPercent": { "type": "number" },
+        "ticketCommissionPercent": { "type": "number" },
+        "subscriptionCommissionPercent": { "type": "number" }
+      },
+      "required": ["storeCommissionPercent", "ticketCommissionPercent", "subscriptionCommissionPercent"]
+    },
+    "IssuedTicket": {
+      "title": "IssuedTicket",
+      "description": "Ingressos reais emitidos após a aprovação do pagamento de um show",
+      "type": "object",
+      "properties": {
+        "ticketId": { "type": "string" },
+        "orderId": { "type": "string" },
+        "eventId": { "type": "string" },
+        "sectorId": { "type": "string" },
+        "lotId": { "type": "string" },
+        "buyerId": { "type": "string" },
+        "buyerName": { "type": "string" },
+        "buyerEmail": { "type": "string" },
+        "paymentId": { "type": "string" },
+        "qrToken": { "type": "string" },
+        "ticketValid": { "type": "boolean" },
+        "qrActive": { "type": "boolean" },
+        "checkedIn": { "type": "boolean" },
+        "checkedInAt": { "type": "string" },
+        "checkedInBy": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["ticketId", "orderId", "eventId", "sectorId", "lotId", "buyerEmail", "qrToken", "ticketValid", "qrActive", "checkedIn", "createdAt"]
+    },
+    "UserInvite": {
+      "title": "UserInvite",
+      "description": "Convites e tokens de ativação de conta para novos artistas e membros",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "token": { "type": "string" },
+        "userId": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "name": { "type": "string" },
+        "artisticName": { "type": "string" },
+        "role": { "type": "string" },
+        "status": { "type": "string" },
+        "expiresAt": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "acceptedAt": { "type": "string" }
+      },
+      "required": ["id", "token", "userId", "email", "status", "expiresAt", "createdAt"]
+    },
+    "UserWallet": {
+      "title": "UserWallet",
+      "description": "Carteira digital interna dos usuários Lockdown, mantendo o saldo em centavos",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "balance": { "type": "integer" },
+        "updatedAt": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["userId", "balance", "updatedAt", "createdAt"]
+    },
+    "WalletTransaction": {
+      "title": "WalletTransaction",
+      "description": "Movimentações financeiras da carteira digital dos usuários",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "type": { "type": "string" },
+        "amount": { "type": "integer" },
+        "direction": { "type": "string" },
+        "status": { "type": "string" },
+        "source": { "type": "string" },
+        "referenceId": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "processedAt": { "type": "string" },
+        "reason": { "type": "string" },
+        "adminId": { "type": "string" }
+      },
+      "required": ["id", "userId", "type", "amount", "direction", "status", "source", "createdAt"]
+    },
+    "SussurroBox": {
+      "title": "SussurroBox",
+      "description": "Configuração da caixa de Sussurros do usuário",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "enabled": { "type": "boolean" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["userId", "enabled", "updatedAt"]
+    },
+    "SussurroMessage": {
+      "title": "SussurroMessage",
+      "description": "Mensagens de Sussurros recebidas",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "recipientUid": { "type": "string" },
+        "text": { "type": "string" },
+        "anonymousMode": { "type": "string" },
+        "revealAllowed": { "type": "boolean" },
+        "revealed": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "readAt": { "type": "string" },
+        "status": { "type": "string" },
+        "moderationStatus": { "type": "string" }
+      },
+      "required": ["id", "recipientUid", "text", "anonymousMode", "revealAllowed", "revealed", "createdAt", "status"]
+    },
+    "SussurroPrivate": {
+      "title": "SussurroPrivate",
+      "description": "Registro privado de identidades para revelação de Sussurros (restrito)",
+      "type": "object",
+      "properties": {
+        "messageId": { "type": "string" },
+        "senderUid": { "type": "string" },
+        "recipientUid": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["messageId", "recipientUid", "createdAt"]
+    },
+    "SussurroReport": {
+      "title": "SussurroReport",
+      "description": "Denúncia de abuso em Sussurros recebidos",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "messageId": { "type": "string" },
+        "reporterId": { "type": "string" },
+        "category": { "type": "string" },
+        "details": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "messageId", "reporterId", "category", "status", "createdAt"]
+    },
+    "AnonymousMessagesConfig": {
+      "title": "AnonymousMessagesConfig",
+      "description": "Configuração do sistema de mensagens anônimas Sussurros",
+      "type": "object",
+      "properties": {
+        "revealPrice": { "type": "number" }
+      },
+      "required": ["revealPrice"]
+    },
+    "ProfileCategory": {
+      "title": "ProfileCategory",
+      "description": "Categorias públicas para perfis de usuários",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "active": { "type": "boolean" },
+        "order": { "type": "integer" }
+      },
+      "required": ["id", "name", "slug", "active", "order"]
+    },
+    "Poll": {
+      "title": "Poll",
+      "description": "Enquetes criadas por usuários com contagem de votos",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "authorId": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorUsername": { "type": "string" },
+        "authorAvatar": { "type": "string" },
+        "question": { "type": "string" },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "text": { "type": "string" },
+              "votesCount": { "type": "integer" }
+            }
+          }
+        },
+        "totalVotes": { "type": "integer" },
+        "duration": { "type": "string" },
+        "endsAt": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "authorId", "question", "options", "endsAt", "status", "createdAt"]
+    },
+    "PollVote": {
+      "title": "PollVote",
+      "description": "Voto individual de um usuário autenticado em uma enquete",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "pollId": { "type": "string" },
+        "uid": { "type": "string" },
+        "optionId": { "type": "string" },
+        "votedAt": { "type": "string" }
+      },
+      "required": ["id", "pollId", "uid", "optionId", "votedAt"]
+    },
+    "Fundraiser": {
+      "title": "Fundraiser",
+      "description": "Campanhas de arrecadação (Vaquinhas) criadas por usuários",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "ownerUid": { "type": "string" },
+        "ownerName": { "type": "string" },
+        "ownerUsername": { "type": "string" },
+        "ownerAvatar": { "type": "string" },
+        "title": { "type": "string" },
+        "slug": { "type": "string" },
+        "coverUrl": { "type": "string" },
+        "shortDescription": { "type": "string" },
+        "description": { "type": "string" },
+        "goalAmount": { "type": "number" },
+        "raisedAmount": { "type": "number" },
+        "status": { "type": "string" },
+        "categoryId": { "type": "string" },
+        "showOnProfile": { "type": "boolean" },
+        "allowSharing": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "endsAt": { "type": "string" },
+        "supporterCount": { "type": "integer" }
+      },
+      "required": ["id", "ownerUid", "title", "slug", "goalAmount", "status", "createdAt"]
+    },
+    "FundraiserContribution": {
+      "title": "FundraiserContribution",
+      "description": "Contribuições realizadas em vaquinhas",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "fundraiserId": { "type": "string" },
+        "contributorId": { "type": "string" },
+        "contributorName": { "type": "string" },
+        "amount": { "type": "number" },
+        "platformFee": { "type": "number" },
+        "netAmount": { "type": "number" },
+        "status": { "type": "string" },
+        "paymentMethod": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "fundraiserId", "contributorId", "amount", "status", "createdAt"]
+    },
+    "TravelBooking": {
+      "title": "TravelBooking",
+      "description": "Buscas e reservas de passagens aéreas ou rodoviárias",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "type": { "type": "string" },
+        "origin": { "type": "string" },
+        "destination": { "type": "string" },
+        "departureDate": { "type": "string" },
+        "passengers": { "type": "integer" },
+        "status": { "type": "string" },
+        "amount": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "type", "origin", "destination", "status", "createdAt"]
+    },
+    "ChatThread": {
+      "title": "ChatThread",
+      "description": "Conversas e threads de mensagens diretas entre membros da plataforma",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "participants": { "type": "array" },
+        "participantNames": { "type": "object" },
+        "participantAvatars": { "type": "object" },
+        "participantUsernames": { "type": "object" },
+        "lastMessage": { "type": "string" },
+        "lastMessageAt": { "type": "string" },
+        "unreadCount": { "type": "object" },
+        "updatedAt": { "type": "string" },
+        "status": { "type": "string" },
+        "requestBy": { "type": "string" },
+        "pricePerMessage": { "type": "number" }
+      },
+      "required": ["id", "participants", "updatedAt", "status"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "Mensagens individuais enviadas dentro de conversas do chat",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "threadId": { "type": "string" },
+        "senderUid": { "type": "string" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "read": { "type": "boolean" },
+        "type": { "type": "string" },
+        "status": { "type": "string" },
+        "unlocked": { "type": "boolean" },
+        "paymentId": { "type": "string" }
+      },
+      "required": ["id", "threadId", "senderUid", "text", "createdAt"]
+    },
+    "TradeSettings": {
+      "title": "TradeSettings",
+      "description": "Configurações globais e limites de risco do módulo VOXA Trade",
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "realMoneyEnabled": { "type": "boolean" },
+        "winPayoutPercent": { "type": "number" },
+        "tradeFeePercent": { "type": "number" },
+        "minimumStake": { "type": "number" },
+        "maximumStake": { "type": "number" },
+        "maximumUserExposure": { "type": "number" },
+        "maximumPlatformExposure": { "type": "number" },
+        "allowedDurations": { "type": "array" },
+        "allowedAssets": { "type": "array" },
+        "maxOpenPositionsPerUser": { "type": "integer" },
+        "assets": { "type": "array" },
+        "updatedAt": { "type": "string" },
+        "updatedBy": { "type": "string" }
+      },
+      "required": [
+        "enabled",
+        "realMoneyEnabled",
+        "winPayoutPercent",
+        "tradeFeePercent",
+        "minimumStake",
+        "maximumStake",
+        "maximumUserExposure",
+        "maximumPlatformExposure",
+        "allowedDurations",
+        "allowedAssets"
+      ]
+    },
+    "TradePosition": {
+      "title": "TradePosition",
+      "description": "Posições de negociação com saldo real no módulo VOXA Trade",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userUid": { "type": "string" },
+        "assetId": { "type": "string" },
+        "assetSymbol": { "type": "string" },
+        "direction": { "type": "string" },
+        "stakeAmount": { "type": "integer" },
+        "entryPrice": { "type": "number" },
+        "entryTimestamp": { "type": "string" },
+        "expiryTimestamp": { "type": "string" },
+        "exitPrice": { "type": "number" },
+        "status": { "type": "string" },
+        "payoutPercent": { "type": "number" },
+        "grossResult": { "type": "integer" },
+        "fees": { "type": "integer" },
+        "netResult": { "type": "integer" },
+        "marketDataProvider": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "settledAt": { "type": "string" }
+      },
+      "required": ["id", "userUid", "assetId", "assetSymbol", "direction", "stakeAmount", "entryPrice", "entryTimestamp", "expiryTimestamp", "status", "createdAt"]
+    },
+    "InvestProduct": {
+      "title": "InvestProduct",
+      "description": "Produtos de investimento configuráveis pelo Admin no módulo VOXA Invest",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "description": { "type": "string" },
+        "strategyDescription": { "type": "string" },
+        "underlyingAssets": { "type": "array" },
+        "active": { "type": "boolean" },
+        "featured": { "type": "boolean" },
+        "minAmountCentavos": { "type": "integer" },
+        "maxAmountCentavos": { "type": "integer" },
+        "lockupMonths": { "type": "integer" },
+        "lockupDays": { "type": "integer" },
+        "targetReturnMinPercent": { "type": "number" },
+        "targetReturnMaxPercent": { "type": "number" },
+        "historicalReturnMinPercent": { "type": "number" },
+        "historicalReturnMaxPercent": { "type": "number" },
+        "managementFeePercent": { "type": "number" },
+        "performanceFeePercent": { "type": "number" },
+        "riskLevel": { "type": "string" },
+        "riskDisclosure": { "type": "string" },
+        "order": { "type": "integer" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "name", "active", "minAmountCentavos", "maxAmountCentavos", "lockupMonths", "targetReturnMinPercent", "targetReturnMaxPercent", "riskLevel"]
+    },
+    "InvestPosition": {
+      "title": "InvestPosition",
+      "description": "Aplicações e posições de usuários em produtos de criptoativos do VOXA Invest",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userUid": { "type": "string" },
+        "userName": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "productId": { "type": "string" },
+        "productName": { "type": "string" },
+        "principalAmountCentavos": { "type": "integer" },
+        "currentValuationCentavos": { "type": "integer" },
+        "realizedReturnCentavos": { "type": "integer" },
+        "realizedReturnPercent": { "type": "number" },
+        "lockupMonths": { "type": "integer" },
+        "lockupDays": { "type": "integer" },
+        "appliedAt": { "type": "string" },
+        "maturityDate": { "type": "string" },
+        "settledAt": { "type": "string" },
+        "status": { "type": "string" },
+        "riskAcceptedAt": { "type": "string" },
+        "performanceHistory": { "type": "array" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "userUid", "productId", "productName", "principalAmountCentavos", "appliedAt", "maturityDate", "status", "riskAcceptedAt"]
+    },
+    "InvestSettings": {
+      "title": "InvestSettings",
+      "description": "Configurações globais e termos de risco do módulo VOXA Invest",
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "acceptingNewApplications": { "type": "boolean" },
+        "defaultLockupMonths": { "type": "integer" },
+        "defaultLockupDays": { "type": "integer" },
+        "platformCustodyNotice": { "type": "string" },
+        "regulatoryDisclaimer": { "type": "string" },
+        "riskWarningTitle": { "type": "string" },
+        "riskWarningBullets": { "type": "array" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["enabled", "acceptingNewApplications", "defaultLockupMonths"]
+    }
+  },
+  "firestore": {
+    "/chat_threads/{threadId}": {
+      "schema": "ChatThread",
+      "description": "Conversas e canais de chat privado"
+    },
+    "/chat_messages/{messageId}": {
+      "schema": "ChatMessage",
+      "description": "Mensagens e anexos de conversas diretas"
+    },
+    "/users/{userId}": {
+      "schema": "FirestoreUser",
+      "description": "Contas centralizadas e identidades dos usuários da plataforma"
+    },
+    "/profile_categories/{categoryId}": {
+      "schema": "ProfileCategory",
+      "description": "Categorias públicas para seleção no perfil do usuário"
+    },
+    "/fundraisers/{fundraiserId}": {
+      "schema": "Fundraiser",
+      "description": "Campanhas de financiamento coletivo (Vaquinhas)"
+    },
+    "/fundraiser_contributions/{contributionId}": {
+      "schema": "FundraiserContribution",
+      "description": "Histórico de apoios financeiros em vaquinhas"
+    },
+    "/travel_bookings/{bookingId}": {
+      "schema": "TravelBooking",
+      "description": "Registro de intenções de viagem e reservas de passagens"
+    },
+    "/user_invites/{inviteId}": {
+      "schema": "UserInvite",
+      "description": "Convites de acesso e criação de senha para novos membros"
+    },
+    "/communities/{communityId}": {
+      "schema": "Community",
+      "description": "Comunidades e canais oficiais da Lockdown"
+    },
+    "/lockdown_music_shares/{shareId}": {
+      "schema": "ArtistShare",
+      "description": "Mapeamento financeiro e faturamentos de fonogramas"
+    },
+    "/distribution_clearances/{clearanceId}": {
+      "schema": "DistributionClearance",
+      "description": "Documentação e autorizações de distribuição de voz"
+    },
+    "/artists/{artistId}": {
+      "schema": "DetailedArtist",
+      "description": "Lista de artistas gerenciada pelo administrador"
+    },
+    "/music_streams/{streamId}": {
+      "schema": "MusicStream",
+      "description": "Lista de faixas e resultados de streams gerenciada pelo administrador"
+    },
+    "/store_products/{productId}": {
+      "schema": "Product",
+      "description": "Produtos cadastrados na Loja pelo administrador"
+    },
+    "/seller_requests/{requestId}": {
+      "schema": "SellerRequest",
+      "description": "Pedidos de usuários para aprovação de perfil de vendedor"
+    },
+    "/store_settings/{settingsId}": {
+      "schema": "StoreSettings",
+      "description": "Configurações de taxas padrão e comissão da plataforma"
+    },
+    "/store_orders/{orderId}": {
+      "schema": "StoreOrder",
+      "description": "Histórico de transações de compras e cálculo de repasse líquido para vendedores"
+    },
+    "/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "Notificações internas de repasse ou aprovação do usuário"
+    },
+    "/support_tickets/{ticketId}": {
+      "schema": "SupportTicket",
+      "description": "Mensagens e tickets de suporte abertos entre usuário e admin"
+    },
+    "/subscription_plans/{planId}": {
+      "schema": "SubscriptionPlan",
+      "description": "Planos de assinatura de artistas/vendedores aguardando aprovação"
+    },
+    "/commission_settings/{settingId}": {
+      "schema": "CommissionSettings",
+      "description": "Definição de taxas de faturamento da produtora"
+    },
+    "/tickets_issued/{ticketId}": {
+      "schema": "IssuedTicket",
+      "description": "Ingressos gerados para acesso aos shows da Lockdown"
+    },
+    "/wallets/{userId}": {
+      "schema": "UserWallet",
+      "description": "Carteiras digitais internas com saldo dos usuários"
+    },
+    "/wallet_transactions/{transactionId}": {
+      "schema": "WalletTransaction",
+      "description": "Razão e registro detalhado de todas as movimentações financeiras das carteiras"
+    },
+    "/sussurro_boxes/{userId}": {
+      "schema": "SussurroBox",
+      "description": "Estado ativado/desativado da caixa de sussurros dos membros"
+    },
+    "/sussurro_messages/{messageId}": {
+      "schema": "SussurroMessage",
+      "description": "Sussurros anônimos recebidos na caixa de entrada"
+    },
+    "/sussurro_private/{messageId}": {
+      "schema": "SussurroPrivate",
+      "description": "Coleção privada ligando a mensagem ao remetente real (apenas para revelação)"
+    },
+    "/sussurro_reports/{reportId}": {
+      "schema": "SussurroReport",
+      "description": "Denúncias de assédio, abuso ou ameaças em sussurros"
+    },
+    "/anonymous_messages_config/{configId}": {
+      "schema": "AnonymousMessagesConfig",
+      "description": "Configuração de preço de revelação do sistema"
+    },
+    "/polls/{pollId}": {
+      "schema": "Poll",
+      "description": "Enquetes da comunidade VOXA"
+    },
+    "/poll_votes/{voteDocId}": {
+      "schema": "PollVote",
+      "description": "Registro de voto único por usuário em enquetes"
+    },
+    "/trade_settings/{settingsId}": {
+      "schema": "TradeSettings",
+      "description": "Configuração global e parâmetros de risco do VOXA Trade (trade_settings/global)"
+    },
+    "/trade_positions/{positionId}": {
+      "schema": "TradePosition",
+      "description": "Posições abertas e liquidadas com saldo real no VOXA Trade"
+    },
+    "/invest_products/{productId}": {
+      "schema": "InvestProduct",
+      "description": "Produtos de investimento configuráveis pelo Admin no VOXA Invest"
+    },
+    "/invest_positions/{positionId}": {
+      "schema": "InvestPosition",
+      "description": "Aplicações e posições com lock-up e apuração real no VOXA Invest"
+    },
+    "/invest_settings/{settingsId}": {
+      "schema": "InvestSettings",
+      "description": "Configurações globais e avisos regulatórios do VOXA Invest"
+    }
+  }
+}

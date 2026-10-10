@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="pt-BR" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="VOXA" />
+    <title>VOXA — Uma nova dimensão social.</title>
+    <meta name="description" content="Uma nova dimensão social. Uma rede social futurista e ecossistema digital completo." />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="VOXA" />
+    <meta property="og:title" content="VOXA — Uma nova dimensão social." />
+    <meta property="og:description" content="Uma nova dimensão social. Uma rede social futurista e ecossistema digital completo." />
+    <meta property="og:image" content="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 400'%3E%3Crect width='800' height='400' fill='%23000000'/%3E%3Ctext x='400' y='210' font-family='Orbitron, Arial' font-size='80' font-weight='900' fill='%23FFFFFF' text-anchor='middle' letter-spacing='10'%3EVOXA%3C/text%3E%3Ctext x='400' y='260' font-family='Orbitron, Arial' font-size='18' font-weight='600' fill='%23666666' text-anchor='middle' letter-spacing='4'%3EUMA NOVA DIMENSÃO SOCIAL%3C/text%3E%3C/svg%3E" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="VOXA — Uma nova dimensão social." />
+    <meta name="twitter:description" content="Uma nova dimensão social. Uma rede social futurista e ecossistema digital completo." />
+    <meta name="twitter:image" content="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 400'%3E%3Crect width='800' height='400' fill='%23000000'/%3E%3Ctext x='400' y='210' font-family='Orbitron, Arial' font-size='80' font-weight='900' fill='%23FFFFFF' text-anchor='middle' letter-spacing='10'%3EVOXA%3C/text%3E%3Ctext x='400' y='260' font-family='Orbitron, Arial' font-size='18' font-weight='600' fill='%23666666' text-anchor='middle' letter-spacing='4'%3EUMA NOVA DIMENSÃO SOCIAL%3C/text%3E%3C/svg%3E" />
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='30' fill='%23000000'/%3E%3Ctext x='50' y='68' font-family='Orbitron, Arial' font-size='55' font-weight='900' fill='%23FFFFFF' text-anchor='middle'%3EV%3C/text%3E%3C/svg%3E" />
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='30' fill='%23000000'/%3E%3Ctext x='50' y='68' font-family='Orbitron, Arial' font-size='55' font-weight='900' fill='%23FFFFFF' text-anchor='middle'%3EV%3C/text%3E%3C/svg%3E" />
+    <script>
+      (function() {
+        try {
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+              for (let registration of registrations) {
+                if (window.location.hostname.includes('ais-dev') || (registration.active && registration.active.scriptURL.includes('firebase-messaging-sw'))) {
+                  registration.unregister();
+                }
+              }
+            }).catch(function() {});
+          }
+          if ('caches' in window && window.location.hostname.includes('ais-dev')) {
+            caches.keys().then(function(names) {
+              for (let name of names) {
+                caches.delete(name);
+              }
+            }).catch(function() {});
+          }
+          const cached = localStorage.getItem('voxa_company_settings') || localStorage.getItem('lockdown_company_settings');
+          if (cached) {
+            const settings = JSON.parse(cached);
+            const targetUrl = settings.faviconUrl || settings.logoUrl;
+            if (targetUrl) {
+              const link = document.querySelector("link[rel*='icon']");
+              if (link) {
+                link.href = targetUrl;
+                let type = 'image/png';
+                const lowerUrl = targetUrl.toLowerCase();
+                if (lowerUrl.includes('.ico')) type = 'image/x-icon';
+                else if (lowerUrl.includes('.svg')) type = 'image/svg+xml';
+                else if (lowerUrl.includes('.webp')) type = 'image/webp';
+                else if (lowerUrl.includes('.jpg') || lowerUrl.includes('.jpeg')) type = 'image/jpeg';
+                link.type = type;
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('Favicon early sync failed:', e);
+        }
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+  </head>
+  <body class="bg-black text-white selection:bg-[#FF0033] selection:text-white font-['Inter',sans-serif]">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

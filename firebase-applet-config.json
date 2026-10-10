@@ -1,0 +1,12 @@
+{
+  "projectId": "voxa-site",
+  "appId": "1:627882810621:web:7124556d38a5dd4b7b3294",
+  "apiKey": "AIzaSyDeSLSoU2Cfgo9dHtOJ6s53qvIS2SXLFCg",
+  "authDomain": "voxa-site.firebaseapp.com",
+  "firestoreDatabaseId": "ai-studio-voxa-88b709d6-62fd-4a0d-b036-525f4b713a4e",
+  "storageBucket": "voxa-site.firebasestorage.app",
+  "messagingSenderId": "627882810621",
+  "measurementId": "",
+  "oAuthClientId": "627882810621-pvqc9sjmb3s9uc7adcfcq50qdlkftf77.apps.googleusercontent.com",
+  "recaptchaSiteKey": ""
+}

@@ -1,0 +1,8 @@
+{
+  "name": "VOXA Social",
+  "description": "Uma nova dimensão social. Uma rede social futurista e ecossistema digital completo.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
